@@ -1,5 +1,3 @@
-# NiceJson
-
 ## Description
 NiceJson is a simple C# library for JSON. You can use NiceJson to encode or decode JSON text.
 
