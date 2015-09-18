@@ -86,7 +86,7 @@ public class JsonExample
             ]
         */
 
-        //Also you can configurate the Json.IDENT_CHAR (\t,' ',whatever you want) and Json.PRETTYPRINT_IDENT_COUNT (for number of times you want to repeat char per ident)
+        //Also you can configurate the Json.PRETTYPRINT_IDENT_CHAR (\t,' ',whatever you want) and Json.PRETTYPRINT_IDENT_COUNT (for number of times you want to repeat char per ident)
 
         //Parsing json it's easy :)
 
