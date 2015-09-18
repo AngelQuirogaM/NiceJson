@@ -1,1 +1,5 @@
 /test/Library
+/test/Temp
+/test/*.csproj
+/test/*.sln
+/test/.vs/test/v14/*.suo

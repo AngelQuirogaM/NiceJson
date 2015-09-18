@@ -1,16 +1,4 @@
-## Description
-NiceJson is a simple C# library for JSON. You can use NiceJson to encode or decode JSON text. **No binary saves, no Output/InputStreams, no bullshit. Just input/output string with pretty print** (if you want to have it ready to read ;) .
-
-## Features
-* Full compliance with JSON specification (RFC4627) (needs testing)
-* With implicit operators.
-* Simple string input output [JsonNode.ToJsonString(), JsonNode.ToJsonPrettyPrintString(),JsonNode.ParseJsonString(string json)]
-
-## Sample
-All you have to do is read the Sample to know how all the library works;)
-
-```csharp
-using NiceJson;
+﻿using NiceJson;
 
 public class JsonExample
 {
@@ -64,24 +52,24 @@ public class JsonExample
             outPutPrettyPrintString :
 
             [
-                {
-                    "name": "Ángel",
-                    "age": 27,
-                    "programmer": true,
-                    "glasses": null,
-                    "surname": "Surname"
-                },
-                {
-                    "name": "Manolo",
-                    "age": 54.4,
-                    "programmer": false,
-                    "glasses": [
-                        "sunglases",
-                        3,
-                        null
-                    ],
-                    "surname": "Surname"
-                }
+	            {
+		            "name": "Ángel",
+		            "age": 27,
+		            "programmer": true,
+		            "glasses": null,
+		            "surname": "Surname"
+	            },
+	            {
+		            "name": "Manolo",
+		            "age": 54.4,
+		            "programmer": false,
+		            "glasses": [
+			            "sunglases",
+			            3,
+			            null
+		            ],
+		            "surname": "Surname"
+	            }
             ]
         */
 
@@ -93,6 +81,3 @@ public class JsonExample
 
     }
 }
-
-
-```
