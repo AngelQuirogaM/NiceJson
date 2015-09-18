@@ -1,5 +1,6 @@
 ## Description
-NiceJson is a simple C# library for JSON. You can use NiceJson to encode or decode JSON text. **No binary saves, no Output/InputStreams, no bullshit. Just input/output string with pretty print** (if you want to have it ready to read ;) .
+NiceJson is a simple C# library for JSON. You can use NiceJson to encode or decode JSON text. No binary saves, no Output/InputStreams, no bullshit.
+**Just input/output string with optional pretty print**.
 
 ## Features
 * Full compliance with JSON specification (RFC4627) (needs testing)
