@@ -10,7 +10,7 @@ public class JsonTest : MonoBehaviour {
     {
         ExampleTest();
         //InputOutputFileTest();
-        CreateJsonTest();
+        //CreateJsonTest();
     }
 
     private void ExampleTest()
@@ -66,4 +66,5 @@ public class JsonTest : MonoBehaviour {
 
         Debug.Log("Test InputOutputFileTest done: \n"+ weekDiet.ToJsonPrettyPrintString());
     }
+
 }

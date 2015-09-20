@@ -1,20 +1,26 @@
 ﻿/*
-   NiceJson is a simple library for JSON Data Interchange Standard
-   Copyright (C) 2015 Ángel Quiroga Mendoza <me@angelqm.com>
+    MIT License
+    ===========
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+    Copyright (C) 2015 Ángel Quiroga Mendoza <me@angelqm.com>
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+    Permission is hereby granted, free of charge, to any person obtaining a copy of
+    this software and associated documentation files (the "Software"), to deal in
+    the Software without restriction, including without limitation the rights to
+    use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+    of the Software, and to permit persons to whom the Software is furnished to do
+    so, subject to the following conditions:
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 */
 
 using System;
@@ -26,8 +32,8 @@ namespace NiceJson
 {
 	public abstract class JsonNode
 	{
-        public const char IDENT_CHAR = ' ';
-        public const int IDENT_COUNT = 1;
+        public const char PP_IDENT_CHAR = '\t';
+        public const int PP_IDENT_COUNT = 1;
 
         public const char CHAR_CURLY_OPEN = '{';
         public const char CHAR_CURLY_CLOSED = '}';
@@ -52,6 +58,53 @@ namespace NiceJson
         public const string STRING_LITERAL_NULL = "null";
         public const string STRING_LITERAL_TRUE = "true";
         public const string STRING_LITERAL_FALSE = "false";
+
+        //Indexers
+        public JsonNode this[string key]
+        {
+            get
+            {
+                if (this is JsonObject)
+                {
+                    return ((JsonObject)this)[key];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            set
+            {
+                if (this is JsonObject)
+                {
+                    ((JsonObject)this)[key] = value;
+                }
+            }
+        }
+
+        public JsonNode this[int index]
+        {
+            get
+            {
+                if (this is JsonArray)
+                {
+                    return ((JsonArray)this)[index];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            set
+            {
+                if (this is JsonArray)
+                {
+                    ((JsonArray)this)[index] = value;
+                }
+            }
+        }
 
         //setter implicit casting 
 
@@ -106,376 +159,35 @@ namespace NiceJson
 
 		public static implicit operator int(JsonNode value)
 		{
-			return int.Parse(((JsonBasic) value).ToString());
-		}
+            return (int) Convert.ChangeType(((JsonBasic)value).ValueObject,typeof(int));
+        }
 
         public static implicit operator long (JsonNode value)
         {
-            return long.Parse(((JsonBasic)value).ToString());
+            return (long) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(long));
         }
 
         public static implicit operator float(JsonNode value)
 		{
-			return float.Parse(((JsonBasic) value).ToString());
-		}
+            return (float) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(float));
+        }
 		
 		public static implicit operator double(JsonNode value)
 		{
-			return double.Parse(((JsonBasic) value).ToString());
-		}
+            return (double) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(double));
+        }
 
         public static implicit operator decimal (JsonNode value)
         {
-            return decimal.Parse(((JsonBasic)value).ToString());
+            return (decimal) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(decimal));
         }
 
         public static implicit operator bool(JsonNode value)
 		{
-			return bool.Parse(((JsonBasic) value).ToString());
-		}
-
-		public abstract string ToJsonString();
-
-        public string ToJsonPrettyPrintString()
-        {
-            string jsonString = this.ToJsonString();
-
-            string identStep = string.Empty;
-            for (int i = 0; i < IDENT_COUNT; i++)
-            {
-                identStep += IDENT_CHAR;
-            }
-
-            bool inString = false;
-
-            string currentIdent = string.Empty;
-            for (int i = 0; i < jsonString.Length; i++)
-            {
-                switch (jsonString[i])
-                {
-                    case CHAR_COLON:
-                        {
-                            if (!inString)
-                            {
-                                jsonString = jsonString.Insert(i + 1, STRING_SPACE);
-                            }
-                        }
-                        break;
-                    case CHAR_QUOTE:
-                        {
-                            if (i == 0 || (jsonString[i - 1] != CHAR_SCAPE))
-                            {
-                                inString = !inString;
-                            }
-                        }
-                        break;
-                    case CHAR_COMMA:
-                        {
-                            if (!inString)
-                            {
-                                jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
-                            }
-                        }
-                        break;
-                    case CHAR_CURLY_OPEN:
-                    case CHAR_SQUARED_OPEN:
-                        {
-                            if (!inString)
-                            {
-                                currentIdent += identStep;
-                                jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
-                            }
-                        }
-                        break;
-                    case CHAR_CURLY_CLOSED:
-                    case CHAR_SQUARED_CLOSED:
-                        {
-                            if (!inString)
-                            {
-                                currentIdent = currentIdent.Substring(0, currentIdent.Length - identStep.Length);
-                                jsonString = jsonString.Insert(i, CHAR_NL + currentIdent);
-                                i += currentIdent.Length + 1;
-                            }
-                        }
-                        break;
-                }
-            }
-
-            return jsonString;
-        }
-    }
-
-	public class JsonBasic : JsonNode
-	{
-		private object m_value;
-
-		public JsonBasic(object value)
-		{
-			m_value = value;
-		}
-
-		public override string ToString()
-		{
-			return m_value.ToString();
-		}
-
-		public override string ToJsonString ()
-		{
-			if (m_value == null)
-			{
-				return STRING_LITERAL_NULL;
-			}
-			else if (m_value is string)
-			{
-				return CHAR_QUOTE + m_value.ToString() + CHAR_QUOTE;
-			}
-			else if (m_value is bool)
-			{
-                if ((bool) m_value)
-                {
-                    return STRING_LITERAL_TRUE;
-                }
-                else
-                {
-                    return STRING_LITERAL_FALSE;
-                }
-			}
-            else
-            {
-                return m_value.ToString();
-            }
-		}
-
-    }
-
-	public class JsonObject : JsonNode, IEnumerable
-    {
-		private Dictionary<string,JsonNode> m_dictionary = new Dictionary<string, JsonNode>();
-
-        public Dictionary<string,JsonNode>.KeyCollection Keys
-        {
-            get
-            {
-                return m_dictionary.Keys;
-            }
+            return (bool) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(bool));
         }
 
-        public Dictionary<string, JsonNode>.ValueCollection Values
-        {
-            get
-            {
-                return m_dictionary.Values;
-            }
-        }
-
-        public JsonNode this[string key]
-		{
-			get
-			{
-				return m_dictionary[key];
-			}
-
-			set
-			{
-				m_dictionary[key] = value;
-			}
-		}
-
-        public void Add(string key, JsonNode value)
-        {
-            m_dictionary.Add(key, value);
-        }
-
-        public bool Remove(string key)
-        {
-            return m_dictionary.Remove(key);
-        }
-
-        public bool ContainsKey(string key)
-		{
-			return m_dictionary.ContainsKey(key);
-		}
-
-		public bool ContainsValue(JsonNode value)
-		{
-			return m_dictionary.ContainsValue(value);
-		}
-
-        public void Clear()
-        {
-            m_dictionary.Clear();
-        }
-
-        public int Count
-        {
-            get
-            {
-                return m_dictionary.Count;
-            }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            foreach (KeyValuePair<string, JsonNode> jsonKeyValue in m_dictionary)
-            {
-                yield return jsonKeyValue;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public override string ToJsonString ()
-		{
-			if (m_dictionary == null)
-			{
-				return STRING_LITERAL_NULL;
-			}
-			else
-			{
-				string jsonString = string.Empty;
-                jsonString += CHAR_CURLY_OPEN;
-                foreach (string key in m_dictionary.Keys)
-				{
-					jsonString += CHAR_QUOTE+key+ CHAR_QUOTE+ CHAR_COLON;
-					if (m_dictionary[key] != null)
-					{
-						jsonString += m_dictionary[key].ToJsonString();
-					}
-					else
-					{
-						jsonString += STRING_LITERAL_NULL;
-					}
-
-                    jsonString += CHAR_COMMA;
-                }
-				if (jsonString[jsonString.Length -1] == CHAR_COMMA)
-				{
-					jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,
-				}
-				jsonString+= CHAR_CURLY_CLOSED;
-
-				return jsonString;
-			}
-
-		}
-	}
-
-	public class JsonArray : JsonNode, IEnumerable<JsonNode>
-    {
-		private List<JsonNode> m_list = new List<JsonNode>();
-
-		public int Count
-		{
-			get
-			{
-				return m_list.Count;
-			}
-		}
-		
-		public JsonNode this[int index]
-		{
-			get
-			{
-				return m_list[index];
-			}
-			
-			set
-			{
-				m_list[index] = value;
-			}
-		}
-
-        public IEnumerator<JsonNode> GetEnumerator()
-        {
-            foreach (JsonNode value in m_list)
-            {
-                yield return value;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        //expose some methods of list extends with needs
-
-        public void Add(JsonNode item)
-		{
-			m_list.Add(item);
-		}
-
-		public void AddRange(IEnumerable<JsonNode> collection)
-		{
-			m_list.AddRange(collection);
-		}
-
-        public void Insert(int index,JsonNode item)
-        {
-            m_list.Insert(index,item);
-        }
-
-        public void InsertRange(int index,IEnumerable<JsonNode> collection)
-        {
-            m_list.InsertRange(index,collection);
-        }
-
-        public void RemoveAt(int index)
-        {
-            m_list.RemoveAt(index);
-        }
-
-        public bool Remove(JsonNode item)
-		{
-			return m_list.Remove(item);
-		}
-
-		public void Clear()
-		{
-			m_list.Clear();
-		}
-
-		//end exposed methods
-
-		
-		public override string ToJsonString ()
-		{
-			if (m_list == null)
-			{
-				return STRING_LITERAL_NULL;
-			}
-			else
-			{
-				string jsonString = string.Empty;
-                jsonString += CHAR_SQUARED_OPEN;
-                foreach (JsonNode value in m_list)
-				{
-					if (value != null)
-					{
-						jsonString+= value.ToJsonString();
-					}
-					else
-					{
-						jsonString += STRING_LITERAL_NULL;
-					}
-
-                    jsonString += CHAR_COMMA;
-                }
-				if (jsonString[jsonString.Length-1] == CHAR_COMMA)
-				{
-					jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,
-				}
-				jsonString+= CHAR_SQUARED_CLOSED;
-				return jsonString;
-			}
-		}
-	}
-
-    public class JsonUtils
-    {
+        //Parsing logic
         public static JsonNode ParseJsonString(string jsonString)
         {
             return ParseJsonPart(RemoveNonTokenChars(jsonString));
@@ -672,5 +384,354 @@ namespace NiceJson
             }
             return new String(s2, 0, currentPos);
         }
+
+        //Object logic
+
+        public abstract string ToJsonString();
+
+        public string ToJsonPrettyPrintString()
+        {
+            string jsonString = this.ToJsonString();
+
+            string identStep = string.Empty;
+            for (int i = 0; i < PP_IDENT_COUNT; i++)
+            {
+                identStep += PP_IDENT_CHAR;
+            }
+
+            bool inString = false;
+
+            string currentIdent = string.Empty;
+            for (int i = 0; i < jsonString.Length; i++)
+            {
+                switch (jsonString[i])
+                {
+                    case CHAR_COLON:
+                        {
+                            if (!inString)
+                            {
+                                jsonString = jsonString.Insert(i + 1, STRING_SPACE);
+                            }
+                        }
+                        break;
+                    case CHAR_QUOTE:
+                        {
+                            if (i == 0 || (jsonString[i - 1] != CHAR_SCAPE))
+                            {
+                                inString = !inString;
+                            }
+                        }
+                        break;
+                    case CHAR_COMMA:
+                        {
+                            if (!inString)
+                            {
+                                jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
+                            }
+                        }
+                        break;
+                    case CHAR_CURLY_OPEN:
+                    case CHAR_SQUARED_OPEN:
+                        {
+                            if (!inString)
+                            {
+                                currentIdent += identStep;
+                                jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
+                            }
+                        }
+                        break;
+                    case CHAR_CURLY_CLOSED:
+                    case CHAR_SQUARED_CLOSED:
+                        {
+                            if (!inString)
+                            {
+                                currentIdent = currentIdent.Substring(0, currentIdent.Length - identStep.Length);
+                                jsonString = jsonString.Insert(i, CHAR_NL + currentIdent);
+                                i += currentIdent.Length + 1;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            return jsonString;
+        }
     }
+
+	public class JsonBasic : JsonNode
+	{
+        public object ValueObject
+        {
+            get
+            {
+                return m_value;
+            }
+        }
+
+        private object m_value;
+
+		public JsonBasic(object value)
+		{
+			m_value = value;
+		}
+
+		public override string ToString()
+		{
+			return m_value.ToString();
+		}
+
+		public override string ToJsonString ()
+		{
+			if (m_value == null)
+			{
+				return STRING_LITERAL_NULL;
+			}
+			else if (m_value is string)
+			{
+				return CHAR_QUOTE + m_value.ToString() + CHAR_QUOTE;
+			}
+			else if (m_value is bool)
+			{
+                if ((bool) m_value)
+                {
+                    return STRING_LITERAL_TRUE;
+                }
+                else
+                {
+                    return STRING_LITERAL_FALSE;
+                }
+			}
+            else
+            {
+                return m_value.ToString();
+            }
+		}
+
+    }
+
+	public class JsonObject : JsonNode, IEnumerable
+    {
+		private Dictionary<string,JsonNode> m_dictionary = new Dictionary<string, JsonNode>();
+
+        public Dictionary<string,JsonNode>.KeyCollection Keys
+        {
+            get
+            {
+                return m_dictionary.Keys;
+            }
+        }
+
+        public Dictionary<string, JsonNode>.ValueCollection Values
+        {
+            get
+            {
+                return m_dictionary.Values;
+            }
+        }
+
+        public new JsonNode this[string key]
+		{
+			get
+			{
+				return m_dictionary[key];
+			}
+
+			set
+			{
+				m_dictionary[key] = value;
+			}
+		}
+
+        public void Add(string key, JsonNode value)
+        {
+            m_dictionary.Add(key, value);
+        }
+
+        public bool Remove(string key)
+        {
+            return m_dictionary.Remove(key);
+        }
+
+        public bool ContainsKey(string key)
+		{
+			return m_dictionary.ContainsKey(key);
+		}
+
+		public bool ContainsValue(JsonNode value)
+		{
+			return m_dictionary.ContainsValue(value);
+		}
+
+        public void Clear()
+        {
+            m_dictionary.Clear();
+        }
+
+        public int Count
+        {
+            get
+            {
+                return m_dictionary.Count;
+            }
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            foreach (KeyValuePair<string, JsonNode> jsonKeyValue in m_dictionary)
+            {
+                yield return jsonKeyValue;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public override string ToJsonString ()
+		{
+			if (m_dictionary == null)
+			{
+				return STRING_LITERAL_NULL;
+			}
+			else
+			{
+				string jsonString = string.Empty;
+                jsonString += CHAR_CURLY_OPEN;
+                foreach (string key in m_dictionary.Keys)
+				{
+					jsonString += CHAR_QUOTE+key+ CHAR_QUOTE+ CHAR_COLON;
+					if (m_dictionary[key] != null)
+					{
+						jsonString += m_dictionary[key].ToJsonString();
+					}
+					else
+					{
+						jsonString += STRING_LITERAL_NULL;
+					}
+
+                    jsonString += CHAR_COMMA;
+                }
+				if (jsonString[jsonString.Length -1] == CHAR_COMMA)
+				{
+					jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,
+				}
+				jsonString+= CHAR_CURLY_CLOSED;
+
+				return jsonString;
+			}
+
+		}
+	}
+
+	public class JsonArray : JsonNode, IEnumerable<JsonNode>
+    {
+		private List<JsonNode> m_list = new List<JsonNode>();
+
+		public int Count
+		{
+			get
+			{
+				return m_list.Count;
+			}
+		}
+		
+		public new JsonNode this[int index]
+		{
+			get
+			{
+				return m_list[index];
+			}
+			
+			set
+			{
+				m_list[index] = value;
+			}
+		}
+
+        public IEnumerator<JsonNode> GetEnumerator()
+        {
+            foreach (JsonNode value in m_list)
+            {
+                yield return value;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        //expose some methods of list extends with needs
+
+        public void Add(JsonNode item)
+		{
+			m_list.Add(item);
+		}
+
+		public void AddRange(IEnumerable<JsonNode> collection)
+		{
+			m_list.AddRange(collection);
+		}
+
+        public void Insert(int index,JsonNode item)
+        {
+            m_list.Insert(index,item);
+        }
+
+        public void InsertRange(int index,IEnumerable<JsonNode> collection)
+        {
+            m_list.InsertRange(index,collection);
+        }
+
+        public void RemoveAt(int index)
+        {
+            m_list.RemoveAt(index);
+        }
+
+        public bool Remove(JsonNode item)
+		{
+			return m_list.Remove(item);
+		}
+
+		public void Clear()
+		{
+			m_list.Clear();
+		}
+
+		//end exposed methods
+
+		
+		public override string ToJsonString ()
+		{
+			if (m_list == null)
+			{
+				return STRING_LITERAL_NULL;
+			}
+			else
+			{
+				string jsonString = string.Empty;
+                jsonString += CHAR_SQUARED_OPEN;
+                foreach (JsonNode value in m_list)
+				{
+					if (value != null)
+					{
+						jsonString+= value.ToJsonString();
+					}
+					else
+					{
+						jsonString += STRING_LITERAL_NULL;
+					}
+
+                    jsonString += CHAR_COMMA;
+                }
+				if (jsonString[jsonString.Length-1] == CHAR_COMMA)
+				{
+					jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,
+				}
+				jsonString+= CHAR_SQUARED_CLOSED;
+				return jsonString;
+			}
+		}
+	}
 }
