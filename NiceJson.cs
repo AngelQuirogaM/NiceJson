@@ -1,4 +1,6 @@
 ﻿/*
+    NiceJson 1.1 (2015-09-21)
+
     MIT License
     ===========
 
@@ -32,8 +34,8 @@ namespace NiceJson
 {
 	public abstract class JsonNode
 	{
-        public const char PP_IDENT_CHAR = '\t';
-        public const int PP_IDENT_COUNT = 1;
+        public const char PP_IDENT_CHAR = '\t'; //Modify this to spaces or whatever char you want to be the ident one
+        public const int PP_IDENT_COUNT = 1; //Modify this to be the numbers of IDENT_CHAR x identation
 
         public const char CHAR_CURLY_OPEN = '{';
         public const char CHAR_CURLY_CLOSED = '}';
@@ -49,15 +51,29 @@ namespace NiceJson
         public const char CHAR_FALSE_LITERAL = 'f';
 
         public const char CHAR_SPACE = ' ';
+
+        public const char CHAR_BS = '\b';
+        public const char CHAR_FF = '\f';
         public const char CHAR_RF = '\r';
         public const char CHAR_NL = '\n';
-        public const char CHAR_TAB = '\t';
-        public const char CHAR_SCAPE = '\\';
+        public const char CHAR_HT = '\t';
+        public const char CHAR_ESCAPE = '\\';
+        public const char CHAR_ESCAPED_QUOTE = '\"';
+
+        public const string STRING_ESCAPED_BS = "\\b";
+        public const string STRING_ESCAPED_FF = "\\f";
+        public const string STRING_ESCAPED_RF = "\\r";
+        public const string STRING_ESCAPED_NL = "\\n";
+        public const string STRING_ESCAPED_TAB = "\\t";
+        public const string STRING_ESCAPED_ESCAPE = "\\\\";
+        public const string STRING_ESCAPED_ESCAPED_QUOTE = "\\\"";
 
         public const string STRING_SPACE = " ";
         public const string STRING_LITERAL_NULL = "null";
         public const string STRING_LITERAL_TRUE = "true";
         public const string STRING_LITERAL_FALSE = "false";
+
+        public const string STRING_ESCAPED_UNICODE_INIT = "\\u00";
 
         //Indexers
         public JsonNode this[string key]
@@ -104,6 +120,67 @@ namespace NiceJson
                     ((JsonArray)this)[index] = value;
                 }
             }
+        }
+
+        //escaping logic
+
+        //Escaping logic
+        protected string EscapeString(string s)
+        {
+            string result = string.Empty;
+
+            foreach (char c in s)
+            {
+                switch (c)
+                {
+                    case CHAR_ESCAPE:
+                        {
+                            result += STRING_ESCAPED_ESCAPE;
+                        }
+                    break;
+                    case CHAR_ESCAPED_QUOTE:
+                        {
+                            result += STRING_ESCAPED_ESCAPED_QUOTE;
+                        }
+                    break;
+                    case CHAR_NL:
+                        {
+                            result += STRING_ESCAPED_NL;
+                        }
+                    break;
+                    case CHAR_RF:
+                        {
+                            result += STRING_ESCAPED_RF;
+                        }
+                    break;
+                    case CHAR_HT:
+                        {
+                            result += STRING_ESCAPED_TAB;
+                        }
+                    break;
+                    case CHAR_BS:
+                        {
+                            result += STRING_ESCAPED_BS;
+                        }
+                    break;
+                    case CHAR_FF:
+                        {
+                            result += STRING_ESCAPED_FF;
+                        }
+                    break;
+                    default:
+                        if (c < CHAR_SPACE)
+                        {
+                            result += STRING_ESCAPED_UNICODE_INIT + Convert.ToByte(c).ToString("x2").ToUpper();
+                        }
+                        else
+                        {
+                            result += c;
+                        }
+                    break;
+                }
+            }
+            return result;
         }
 
         //setter implicit casting 
@@ -295,7 +372,7 @@ namespace NiceJson
                         break;
                     case JsonNode.CHAR_QUOTE:
                         {
-                            if (i == 0 || (json[i - 1] != JsonNode.CHAR_SCAPE))
+                            if (i == 0 || (json[i - 1] != JsonNode.CHAR_ESCAPE))
                             {
                                 inString = !inString;
                             }
@@ -337,7 +414,7 @@ namespace NiceJson
 
             while (index < json.Length && !found)
             {
-                if (json[index] == JsonNode.CHAR_QUOTE && (index == 0 || (json[index - 1] != JsonNode.CHAR_SCAPE)))
+                if (json[index] == JsonNode.CHAR_QUOTE && (index == 0 || (json[index - 1] != JsonNode.CHAR_ESCAPE)))
                 {
                     if (!inString)
                     {
@@ -371,13 +448,20 @@ namespace NiceJson
                 char c = s[i];
                 if (c == JsonNode.CHAR_QUOTE)
                 {
-                    if (i == 0 || (s[i - 1] != JsonNode.CHAR_SCAPE))
+                    if (i == 0 || (s[i - 1] != JsonNode.CHAR_ESCAPE))
                     {
                         outString = !outString;
                     }
                 }
 
-                if (!(c == JsonNode.CHAR_SPACE && outString) && c != JsonNode.CHAR_RF && c != JsonNode.CHAR_NL && c != JsonNode.CHAR_TAB)
+                if (!outString || (
+                    (c != JsonNode.CHAR_SPACE) &&
+                    (c != JsonNode.CHAR_RF) &&
+                    (c != JsonNode.CHAR_NL) &&
+                    (c != JsonNode.CHAR_HT) &&
+                    (c != JsonNode.CHAR_BS) &&
+                    (c != JsonNode.CHAR_FF)
+                ))
                 {
                     s2[currentPos++] = c;
                 }
@@ -416,7 +500,7 @@ namespace NiceJson
                         break;
                     case CHAR_QUOTE:
                         {
-                            if (i == 0 || (jsonString[i - 1] != CHAR_SCAPE))
+                            if (i == 0 || (jsonString[i - 1] != CHAR_ESCAPE))
                             {
                                 inString = !inString;
                             }
@@ -488,7 +572,7 @@ namespace NiceJson
 			}
 			else if (m_value is string)
 			{
-				return CHAR_QUOTE + m_value.ToString() + CHAR_QUOTE;
+				return CHAR_QUOTE + EscapeString(m_value.ToString()) + CHAR_QUOTE;
 			}
 			else if (m_value is bool)
 			{
@@ -600,7 +684,7 @@ namespace NiceJson
                 jsonString += CHAR_CURLY_OPEN;
                 foreach (string key in m_dictionary.Keys)
 				{
-					jsonString += CHAR_QUOTE+key+ CHAR_QUOTE+ CHAR_COLON;
+					jsonString += CHAR_QUOTE+ EscapeString(key) + CHAR_QUOTE+ CHAR_COLON;
 					if (m_dictionary[key] != null)
 					{
 						jsonString += m_dictionary[key].ToJsonString();

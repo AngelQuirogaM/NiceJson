@@ -1,3 +1,7 @@
+Version 1.1 released 2015-09-21
+
+ * Added escape to JsonObject keys and values with (\" , \\ , \b, \f, \n, \r, \t, [\u0000-\u001F])
+
 Version 1.0 released 2015-09-18
 
  * Initial release

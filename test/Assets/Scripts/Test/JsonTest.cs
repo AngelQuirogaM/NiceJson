@@ -9,8 +9,11 @@ public class JsonTest : MonoBehaviour {
 	void Start ()
     {
         ExampleTest();
-        //InputOutputFileTest();
-        //CreateJsonTest();
+        UnicodeTest();
+        UnicodeFileTest();
+
+        InputOutputFileTest();
+        CreateJsonTest();
     }
 
     private void ExampleTest()
@@ -37,6 +40,43 @@ public class JsonTest : MonoBehaviour {
         File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
 
         Debug.Log("Test InputOutputFileTest done");
+    }
+
+
+    private void UnicodeTest()
+    {
+        string outputPutfile = "/Samples/unicodeSample3.json";
+
+        string stringJson = "{\"Unicode\":[ \"\u001F\" , \"\n\" , \"\b\" , \"\t\" , \"\f\" , \"\r\" ]}";
+        Debug.Log(stringJson);
+
+        JsonNode node = JsonNode.ParseJsonString(stringJson);
+        File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
+
+        string jsonString = File.ReadAllText("Assets/" + outputPutfile);
+        JsonNode node2 = JsonNode.ParseJsonString(jsonString);
+        File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
+
+    }
+
+    private void UnicodeFileTest()
+    {
+        string inputfile = "/Samples/unicodeSample.json";
+        string outputPutfile = "/Samples/unicodeSample2.json";
+
+        //Debug.Log("Reading file " + inputfile + " ...");
+
+        string jsonString = File.ReadAllText("Assets/" + inputfile);
+
+        //Debug.Log("Parse file");
+
+        JsonNode node = JsonNode.ParseJsonString(jsonString);
+
+        //Debug.Log("Saving file " + outputPutfile + " ...");
+
+        File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
+
+        Debug.Log("Test UnicodeFileTest done");
     }
 
     private void CreateJsonTest()
