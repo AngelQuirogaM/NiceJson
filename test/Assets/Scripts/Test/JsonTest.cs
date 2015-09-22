@@ -8,12 +8,13 @@ public class JsonTest : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        ExampleTest();
-        UnicodeTest();
-        UnicodeFileTest();
+        //ExampleTest();
+        //UnicodeTest();
+        UnescapingTest();
+        //UnicodeFileTest();
 
-        InputOutputFileTest();
-        CreateJsonTest();
+        //InputOutputFileTest();
+        //CreateJsonTest();
     }
 
     private void ExampleTest()
@@ -42,13 +43,27 @@ public class JsonTest : MonoBehaviour {
         Debug.Log("Test InputOutputFileTest done");
     }
 
+    private void UnescapingTest()
+    {
+        string outputPutfile = "/Samples/unescapingSample.json";
+        string stringJson = "{\"Unicode\": \"\\\"\u0010\n\",\"Url\":\"http:\\/\\/angelqm.com\"}";
+        JsonNode node = JsonNode.ParseJsonString(stringJson);
+        File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
+
+        stringJson = File.ReadAllText("Assets/" + outputPutfile);
+        node = JsonNode.ParseJsonString(stringJson);
+        File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
+
+        stringJson = File.ReadAllText("Assets/" + outputPutfile);
+        node = JsonNode.ParseJsonString(stringJson);
+        File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
+    }
 
     private void UnicodeTest()
     {
         string outputPutfile = "/Samples/unicodeSample3.json";
 
         string stringJson = "{\"Unicode\":[ \"\u001F\" , \"\n\" , \"\b\" , \"\t\" , \"\f\" , \"\r\" ]}";
-        Debug.Log(stringJson);
 
         JsonNode node = JsonNode.ParseJsonString(stringJson);
         File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
@@ -56,7 +71,6 @@ public class JsonTest : MonoBehaviour {
         string jsonString = File.ReadAllText("Assets/" + outputPutfile);
         JsonNode node2 = JsonNode.ParseJsonString(jsonString);
         File.WriteAllText("Assets/" + outputPutfile, node.ToJsonPrettyPrintString());
-
     }
 
     private void UnicodeFileTest()

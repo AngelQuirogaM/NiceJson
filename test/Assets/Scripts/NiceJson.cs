@@ -1,5 +1,5 @@
 ﻿/*
-    NiceJson 1.1 (2015-09-21)
+    NiceJson 1.2 (2015-09-22)
 
     MIT License
     ===========
@@ -34,46 +34,56 @@ namespace NiceJson
 {
 	public abstract class JsonNode
 	{
-        public const char PP_IDENT_CHAR = '\t'; //Modify this to spaces or whatever char you want to be the ident one
-        public const int PP_IDENT_COUNT = 1; //Modify this to be the numbers of IDENT_CHAR x identation
+        protected const char PP_IDENT_CHAR = '\t'; //Modify this to spaces or whatever char you want to be the ident one
+        protected const int PP_IDENT_COUNT = 1; //Modify this to be the numbers of IDENT_CHAR x identation
+        protected const bool ESCAPE_SOLIDUS = false; //If you are going to to embed this json in html, you can turn this on ref: http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/
 
-        public const char CHAR_CURLY_OPEN = '{';
-        public const char CHAR_CURLY_CLOSED = '}';
-        public const char CHAR_SQUARED_OPEN = '[';
-        public const char CHAR_SQUARED_CLOSED = ']';
+        protected const char CHAR_CURLY_OPEN = '{';
+        protected const char CHAR_CURLY_CLOSED = '}';
+        protected const char CHAR_SQUARED_OPEN = '[';
+        protected const char CHAR_SQUARED_CLOSED = ']';
 
-        public const char CHAR_COLON = ':';
-        public const char CHAR_COMMA = ',';
-        public const char CHAR_QUOTE = '"';
+        protected const char CHAR_COLON = ':';
+        protected const char CHAR_COMMA = ',';
+        protected const char CHAR_QUOTE = '"';
 
-        public const char CHAR_NULL_LITERAL = 'n';
-        public const char CHAR_TRUE_LITERAL = 't';
-        public const char CHAR_FALSE_LITERAL = 'f';
+        protected const char CHAR_NULL_LITERAL = 'n';
+        protected const char CHAR_TRUE_LITERAL = 't';
+        protected const char CHAR_FALSE_LITERAL = 'f';
 
-        public const char CHAR_SPACE = ' ';
+        protected const char CHAR_SPACE = ' ';
 
-        public const char CHAR_BS = '\b';
-        public const char CHAR_FF = '\f';
-        public const char CHAR_RF = '\r';
-        public const char CHAR_NL = '\n';
-        public const char CHAR_HT = '\t';
-        public const char CHAR_ESCAPE = '\\';
-        public const char CHAR_ESCAPED_QUOTE = '\"';
+        protected const char CHAR_BS = '\b';
+        protected const char CHAR_FF = '\f';
+        protected const char CHAR_RF = '\r';
+        protected const char CHAR_NL = '\n';
+        protected const char CHAR_HT = '\t';
+        protected const char CHAR_ESCAPE = '\\';
+        protected const char CHAR_SOLIDUS = '/';
+        protected const char CHAR_ESCAPED_QUOTE = '\"';
 
-        public const string STRING_ESCAPED_BS = "\\b";
-        public const string STRING_ESCAPED_FF = "\\f";
-        public const string STRING_ESCAPED_RF = "\\r";
-        public const string STRING_ESCAPED_NL = "\\n";
-        public const string STRING_ESCAPED_TAB = "\\t";
-        public const string STRING_ESCAPED_ESCAPE = "\\\\";
-        public const string STRING_ESCAPED_ESCAPED_QUOTE = "\\\"";
+        protected const char CHAR_N = 'n';
+        protected const char CHAR_R = 'r';
+        protected const char CHAR_B = 'b';
+        protected const char CHAR_T = 't';
+        protected const char CHAR_F = 'f';
+        protected const char CHAR_U = 'u';
 
-        public const string STRING_SPACE = " ";
-        public const string STRING_LITERAL_NULL = "null";
-        public const string STRING_LITERAL_TRUE = "true";
-        public const string STRING_LITERAL_FALSE = "false";
+        protected const string STRING_ESCAPED_BS = "\\b";
+        protected const string STRING_ESCAPED_FF = "\\f";
+        protected const string STRING_ESCAPED_RF = "\\r";
+        protected const string STRING_ESCAPED_NL = "\\n";
+        protected const string STRING_ESCAPED_TAB = "\\t";
+        protected const string STRING_ESCAPED_ESCAPE = "\\\\";
+        protected const string STRING_ESCAPED_SOLIDUS = "\\/";
+        protected const string STRING_ESCAPED_ESCAPED_QUOTE = "\\\"";
 
-        public const string STRING_ESCAPED_UNICODE_INIT = "\\u00";
+        protected const string STRING_SPACE = " ";
+        protected const string STRING_LITERAL_NULL = "null";
+        protected const string STRING_LITERAL_TRUE = "true";
+        protected const string STRING_LITERAL_FALSE = "false";
+
+        protected const string STRING_ESCAPED_UNICODE_INIT = "\\u00";
 
         //Indexers
         public JsonNode this[string key]
@@ -124,8 +134,8 @@ namespace NiceJson
 
         //escaping logic
 
-        //Escaping logic
-        protected string EscapeString(string s)
+        //Escaping/Unescaping logic
+        protected static string EscapeString(string s)
         {
             string result = string.Empty;
 
@@ -136,6 +146,20 @@ namespace NiceJson
                     case CHAR_ESCAPE:
                         {
                             result += STRING_ESCAPED_ESCAPE;
+                        }
+                    break;
+                    case CHAR_SOLIDUS:
+                        {
+                            #pragma warning disable
+                            if (ESCAPE_SOLIDUS)
+                            {
+                                result += STRING_ESCAPED_SOLIDUS;
+                            }
+                            else
+                            {
+                                result += c;
+                            }
+                            #pragma warning restore
                         }
                     break;
                     case CHAR_ESCAPED_QUOTE:
@@ -180,6 +204,81 @@ namespace NiceJson
                     break;
                 }
             }
+
+            return result;
+        }
+
+        protected static string UnescapeString(string s)
+        {
+            string result = string.Empty;
+            
+            for (int i=0;i<s.Length;i++)
+            {
+                if (s[i] == CHAR_ESCAPE)
+                {
+                    i++;
+
+                    switch(s[i])
+                    {
+                        case CHAR_ESCAPE:
+                            {
+                                result += s[i];
+                            }
+                            break;
+                        case CHAR_SOLIDUS:
+                            {
+                                result += s[i];
+                            }
+                            break;
+                        case CHAR_ESCAPED_QUOTE:
+                            {
+                                result += s[i];
+                            }
+                            break;
+                        case CHAR_N:
+                            {
+                                result += CHAR_NL;
+                            }
+                            break;
+                        case CHAR_R:
+                            {
+                                result += CHAR_RF;
+                            }
+                            break;
+                        case CHAR_T:
+                            {
+                                result += CHAR_HT;
+                            }
+                            break;
+                        case CHAR_B:
+                            {
+                                result += CHAR_BS;
+                            }
+                            break;
+                        case CHAR_F:
+                            {
+                                result += CHAR_FF;
+                            }
+                        break;
+                        case CHAR_U:
+                            {
+                                result += (char) int.Parse(s.Substring(i+1,4),NumberStyles.AllowHexSpecifier);
+                                i = i + 4;
+                            }
+                        break;
+                        default:
+                            {
+                                result += s[i];
+                            }
+                        break;
+                    }
+                }
+                else
+                {
+                    result += s[i];
+                }
+            }
+            
             return result;
         }
 
@@ -284,7 +383,7 @@ namespace NiceJson
                         foreach (string keyValuePart in splittedParts)
                         {
                             keyValueParts = SplitKeyValuePart(keyValuePart);
-                            jsonObject[keyValueParts[0]] = ParseJsonPart(keyValueParts[1]);
+                            jsonObject[JsonNode.UnescapeString(keyValueParts[0])] = ParseJsonPart(keyValueParts[1]);
                         }
                         jsonPartValue = jsonObject;
                     }
@@ -303,7 +402,7 @@ namespace NiceJson
                     break;
                 case JsonNode.CHAR_QUOTE:
                     {
-                        jsonPartValue = new JsonBasic(jsonPart.Substring(1, jsonPart.Length - 2));
+                        jsonPartValue = new JsonBasic(JsonNode.UnescapeString(jsonPart.Substring(1, jsonPart.Length - 2)));
                     }
                     break;
                 case JsonNode.CHAR_FALSE_LITERAL://false

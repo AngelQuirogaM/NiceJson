@@ -1,3 +1,8 @@
+Version 1.2 released 2015-09-22
+
+ * Added unescape when parsing Json
+ * Added solidus option for escaping it ref:http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/
+
 Version 1.1 released 2015-09-21
 
  * Added escape to JsonObject keys and values with (\" , \\ , \b, \f, \n, \r, \t, [\u0000-\u001F])
