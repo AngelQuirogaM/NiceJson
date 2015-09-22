@@ -7,6 +7,7 @@ NiceJson is a simple C# library for JSON. You can use NiceJson to encode or deco
 * With implicit operators.
 * Simple string input output [JsonNode.ToJsonString(), JsonNode.ToJsonPrettyPrintString(),JsonNode.ParseJsonString(string json)]
 * Can be used with Unity3D (Net 2.0)
+* Solidus escaping option (for HTML embedding)
 
 ## Sample
 All you have to do is read the Sample to know how all the library works;)
