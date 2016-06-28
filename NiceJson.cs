@@ -32,6 +32,7 @@ using System.Globalization;
 
 namespace NiceJson
 {
+    [Serializable]
     public abstract class JsonNode
     {
         protected const char PP_IDENT_CHAR = '\t'; //Modify this to spaces or whatever char you want to be the ident one
@@ -653,6 +654,7 @@ namespace NiceJson
         }
     }
 
+    [Serializable]
     public class JsonBasic : JsonNode
     {
         public object ValueObject
@@ -704,6 +706,7 @@ namespace NiceJson
 
     }
 
+    [Serializable]
     public class JsonObject : JsonNode, IEnumerable
     {
         private Dictionary<string,JsonNode> m_dictionary = new Dictionary<string, JsonNode>();
@@ -819,6 +822,7 @@ namespace NiceJson
         }
     }
 
+    [Serializable]
     public class JsonArray : JsonNode, IEnumerable<JsonNode>
     {
         private List<JsonNode> m_list = new List<JsonNode>();
