@@ -1,5 +1,5 @@
 ﻿/*
-    NiceJson 1.2 (2015-09-22)
+    NiceJson 1.3 (2016-06-28)
 
     MIT License
     ===========
@@ -23,6 +23,9 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+
+	Appreciation Contributions:
+		Rayco Sánchez García <raycosanchezgarcia@gmail.com>
 */
 
 using System;
@@ -32,259 +35,272 @@ using System.Globalization;
 
 namespace NiceJson
 {
+	[Serializable]
 	public abstract class JsonNode
 	{
-        protected const char PP_IDENT_CHAR = '\t'; //Modify this to spaces or whatever char you want to be the ident one
-        protected const int PP_IDENT_COUNT = 1; //Modify this to be the numbers of IDENT_CHAR x identation
-        protected const bool ESCAPE_SOLIDUS = false; //If you are going to to embed this json in html, you can turn this on ref: http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/
+		protected const char PP_IDENT_CHAR = '\t'; //Modify this to spaces or whatever char you want to be the ident one
+		protected const int PP_IDENT_COUNT = 1; //Modify this to be the numbers of IDENT_CHAR x identation
+		protected const bool ESCAPE_SOLIDUS = false; //If you are going to to embed this json in html, you can turn this on ref: http://andowebsit.es/blog/noteslog.com/post/the-solidus-issue/
 
-        protected const char CHAR_CURLY_OPEN = '{';
-        protected const char CHAR_CURLY_CLOSED = '}';
-        protected const char CHAR_SQUARED_OPEN = '[';
-        protected const char CHAR_SQUARED_CLOSED = ']';
+		protected const char CHAR_CURLY_OPEN = '{';
+		protected const char CHAR_CURLY_CLOSED = '}';
+		protected const char CHAR_SQUARED_OPEN = '[';
+		protected const char CHAR_SQUARED_CLOSED = ']';
 
-        protected const char CHAR_COLON = ':';
-        protected const char CHAR_COMMA = ',';
-        protected const char CHAR_QUOTE = '"';
+		protected const char CHAR_COLON = ':';
+		protected const char CHAR_COMMA = ',';
+		protected const char CHAR_QUOTE = '"';
 
-        protected const char CHAR_NULL_LITERAL = 'n';
-        protected const char CHAR_TRUE_LITERAL = 't';
-        protected const char CHAR_FALSE_LITERAL = 'f';
+		protected const char CHAR_NULL_LITERAL = 'n';
+		protected const char CHAR_TRUE_LITERAL = 't';
+		protected const char CHAR_FALSE_LITERAL = 'f';
 
-        protected const char CHAR_SPACE = ' ';
+		protected const char CHAR_SPACE = ' ';
 
-        protected const char CHAR_BS = '\b';
-        protected const char CHAR_FF = '\f';
-        protected const char CHAR_RF = '\r';
-        protected const char CHAR_NL = '\n';
-        protected const char CHAR_HT = '\t';
-        protected const char CHAR_ESCAPE = '\\';
-        protected const char CHAR_SOLIDUS = '/';
-        protected const char CHAR_ESCAPED_QUOTE = '\"';
+		protected const char CHAR_BS = '\b';
+		protected const char CHAR_FF = '\f';
+		protected const char CHAR_RF = '\r';
+		protected const char CHAR_NL = '\n';
+		protected const char CHAR_HT = '\t';
+		protected const char CHAR_ESCAPE = '\\';
+		protected const char CHAR_SOLIDUS = '/';
+		protected const char CHAR_ESCAPED_QUOTE = '\"';
 
-        protected const char CHAR_N = 'n';
-        protected const char CHAR_R = 'r';
-        protected const char CHAR_B = 'b';
-        protected const char CHAR_T = 't';
-        protected const char CHAR_F = 'f';
-        protected const char CHAR_U = 'u';
+		protected const char CHAR_N = 'n';
+		protected const char CHAR_R = 'r';
+		protected const char CHAR_B = 'b';
+		protected const char CHAR_T = 't';
+		protected const char CHAR_F = 'f';
+		protected const char CHAR_U = 'u';
 
-        protected const string STRING_ESCAPED_BS = "\\b";
-        protected const string STRING_ESCAPED_FF = "\\f";
-        protected const string STRING_ESCAPED_RF = "\\r";
-        protected const string STRING_ESCAPED_NL = "\\n";
-        protected const string STRING_ESCAPED_TAB = "\\t";
-        protected const string STRING_ESCAPED_ESCAPE = "\\\\";
-        protected const string STRING_ESCAPED_SOLIDUS = "\\/";
-        protected const string STRING_ESCAPED_ESCAPED_QUOTE = "\\\"";
+		protected const string STRING_ESCAPED_BS = "\\b";
+		protected const string STRING_ESCAPED_FF = "\\f";
+		protected const string STRING_ESCAPED_RF = "\\r";
+		protected const string STRING_ESCAPED_NL = "\\n";
+		protected const string STRING_ESCAPED_TAB = "\\t";
+		protected const string STRING_ESCAPED_ESCAPE = "\\\\";
+		protected const string STRING_ESCAPED_SOLIDUS = "\\/";
+		protected const string STRING_ESCAPED_ESCAPED_QUOTE = "\\\"";
 
-        protected const string STRING_SPACE = " ";
-        protected const string STRING_LITERAL_NULL = "null";
-        protected const string STRING_LITERAL_TRUE = "true";
-        protected const string STRING_LITERAL_FALSE = "false";
+		protected const string STRING_SPACE = " ";
+		protected const string STRING_LITERAL_NULL = "null";
+		protected const string STRING_LITERAL_TRUE = "true";
+		protected const string STRING_LITERAL_FALSE = "false";
 
-        protected const string STRING_ESCAPED_UNICODE_INIT = "\\u00";
+		protected const string STRING_ESCAPED_UNICODE_INIT = "\\u00";
 
-        //Indexers
-        public JsonNode this[string key]
-        {
-            get
-            {
-                if (this is JsonObject)
-                {
-                    return ((JsonObject)this)[key];
-                }
-                else
-                {
-                    return null;
-                }
-            }
+		//Indexers and accesors
+		public JsonNode this[string key]
+		{
+			get
+			{
+				if (this is JsonObject)
+				{
+					return ((JsonObject)this)[key];
+				}
+				else
+				{
+					return null;
+				}
+			}
 
-            set
-            {
-                if (this is JsonObject)
-                {
-                    ((JsonObject)this)[key] = value;
-                }
-            }
-        }
+			set
+			{
+				if (this is JsonObject)
+				{
+					((JsonObject)this)[key] = value;
+				}
+			}
+		}
 
-        public JsonNode this[int index]
-        {
-            get
-            {
-                if (this is JsonArray)
-                {
-                    return ((JsonArray)this)[index];
-                }
-                else
-                {
-                    return null;
-                }
-            }
+		public JsonNode this[int index]
+		{
+			get
+			{
+				if (this is JsonArray)
+				{
+					return ((JsonArray)this)[index];
+				}
+				else
+				{
+					return null;
+				}
+			}
 
-            set
-            {
-                if (this is JsonArray)
-                {
-                    ((JsonArray)this)[index] = value;
-                }
-            }
-        }
+			set
+			{
+				if (this is JsonArray)
+				{
+					((JsonArray)this)[index] = value;
+				}
+			}
+		}
 
-        //escaping logic
+		public bool ContainsKey (string key)
+		{
+			if (this is JsonObject)
+			{
+				return ((JsonObject)this).ContainsKey(key);
+			}
+			else
+			{
+				return false;
+			}
+		}
 
-        //Escaping/Unescaping logic
-        protected static string EscapeString(string s)
-        {
-            string result = string.Empty;
+		//escaping logic
 
-            foreach (char c in s)
-            {
-                switch (c)
-                {
-                    case CHAR_ESCAPE:
-                        {
-                            result += STRING_ESCAPED_ESCAPE;
-                        }
-                    break;
-                    case CHAR_SOLIDUS:
-                        {
-                            #pragma warning disable
-                            if (ESCAPE_SOLIDUS)
-                            {
-                                result += STRING_ESCAPED_SOLIDUS;
-                            }
-                            else
-                            {
-                                result += c;
-                            }
-                            #pragma warning restore
-                        }
-                    break;
-                    case CHAR_ESCAPED_QUOTE:
-                        {
-                            result += STRING_ESCAPED_ESCAPED_QUOTE;
-                        }
-                    break;
-                    case CHAR_NL:
-                        {
-                            result += STRING_ESCAPED_NL;
-                        }
-                    break;
-                    case CHAR_RF:
-                        {
-                            result += STRING_ESCAPED_RF;
-                        }
-                    break;
-                    case CHAR_HT:
-                        {
-                            result += STRING_ESCAPED_TAB;
-                        }
-                    break;
-                    case CHAR_BS:
-                        {
-                            result += STRING_ESCAPED_BS;
-                        }
-                    break;
-                    case CHAR_FF:
-                        {
-                            result += STRING_ESCAPED_FF;
-                        }
-                    break;
-                    default:
-                        if (c < CHAR_SPACE)
-                        {
-                            result += STRING_ESCAPED_UNICODE_INIT + Convert.ToByte(c).ToString("x2").ToUpper();
-                        }
-                        else
-                        {
-                            result += c;
-                        }
-                    break;
-                }
-            }
+		//Escaping/Unescaping logic
+		protected static string EscapeString(string s)
+		{
+			string result = string.Empty;
 
-            return result;
-        }
+			foreach (char c in s)
+			{
+				switch (c)
+				{
+				case CHAR_ESCAPE:
+					{
+						result += STRING_ESCAPED_ESCAPE;
+					}
+					break;
+				case CHAR_SOLIDUS:
+					{
+						#pragma warning disable
+						if (ESCAPE_SOLIDUS)
+						{
+							result += STRING_ESCAPED_SOLIDUS;
+						}
+						else
+						{
+							result += c;
+						}
+						#pragma warning restore
+					}
+					break;
+				case CHAR_ESCAPED_QUOTE:
+					{
+						result += STRING_ESCAPED_ESCAPED_QUOTE;
+					}
+					break;
+				case CHAR_NL:
+					{
+						result += STRING_ESCAPED_NL;
+					}
+					break;
+				case CHAR_RF:
+					{
+						result += STRING_ESCAPED_RF;
+					}
+					break;
+				case CHAR_HT:
+					{
+						result += STRING_ESCAPED_TAB;
+					}
+					break;
+				case CHAR_BS:
+					{
+						result += STRING_ESCAPED_BS;
+					}
+					break;
+				case CHAR_FF:
+					{
+						result += STRING_ESCAPED_FF;
+					}
+					break;
+				default:
+					if (c < CHAR_SPACE)
+					{
+						result += STRING_ESCAPED_UNICODE_INIT + Convert.ToByte(c).ToString("x2").ToUpper();
+					}
+					else
+					{
+						result += c;
+					}
+					break;
+				}
+			}
 
-        protected static string UnescapeString(string s)
-        {
-            string result = string.Empty;
-            
-            for (int i=0;i<s.Length;i++)
-            {
-                if (s[i] == CHAR_ESCAPE)
-                {
-                    i++;
+			return result;
+		}
 
-                    switch(s[i])
-                    {
-                        case CHAR_ESCAPE:
-                            {
-                                result += s[i];
-                            }
-                            break;
-                        case CHAR_SOLIDUS:
-                            {
-                                result += s[i];
-                            }
-                            break;
-                        case CHAR_ESCAPED_QUOTE:
-                            {
-                                result += s[i];
-                            }
-                            break;
-                        case CHAR_N:
-                            {
-                                result += CHAR_NL;
-                            }
-                            break;
-                        case CHAR_R:
-                            {
-                                result += CHAR_RF;
-                            }
-                            break;
-                        case CHAR_T:
-                            {
-                                result += CHAR_HT;
-                            }
-                            break;
-                        case CHAR_B:
-                            {
-                                result += CHAR_BS;
-                            }
-                            break;
-                        case CHAR_F:
-                            {
-                                result += CHAR_FF;
-                            }
-                        break;
-                        case CHAR_U:
-                            {
-                                result += (char) int.Parse(s.Substring(i+1,4),NumberStyles.AllowHexSpecifier);
-                                i = i + 4;
-                            }
-                        break;
-                        default:
-                            {
-                                result += s[i];
-                            }
-                        break;
-                    }
-                }
-                else
-                {
-                    result += s[i];
-                }
-            }
-            
-            return result;
-        }
+		protected static string UnescapeString(string s)
+		{
+			string result = string.Empty;
 
-        //setter implicit casting 
+			for (int i=0;i<s.Length;i++)
+			{
+				if (s[i] == CHAR_ESCAPE)
+				{
+					i++;
 
-        public static implicit operator JsonNode(string value)
+					switch(s[i])
+					{
+					case CHAR_ESCAPE:
+						{
+							result += s[i];
+						}
+						break;
+					case CHAR_SOLIDUS:
+						{
+							result += s[i];
+						}
+						break;
+					case CHAR_ESCAPED_QUOTE:
+						{
+							result += s[i];
+						}
+						break;
+					case CHAR_N:
+						{
+							result += CHAR_NL;
+						}
+						break;
+					case CHAR_R:
+						{
+							result += CHAR_RF;
+						}
+						break;
+					case CHAR_T:
+						{
+							result += CHAR_HT;
+						}
+						break;
+					case CHAR_B:
+						{
+							result += CHAR_BS;
+						}
+						break;
+					case CHAR_F:
+						{
+							result += CHAR_FF;
+						}
+						break;
+					case CHAR_U:
+						{
+							result += (char) int.Parse(s.Substring(i+1,4),NumberStyles.AllowHexSpecifier);
+							i = i + 4;
+						}
+						break;
+					default:
+						{
+							result += s[i];
+						}
+						break;
+					}
+				}
+				else
+				{
+					result += s[i];
+				}
+			}
+
+			return result;
+		}
+
+		//setter implicit casting 
+
+		public static implicit operator JsonNode(string value)
 		{
 			return new JsonBasic(value);
 		}
@@ -294,12 +310,12 @@ namespace NiceJson
 			return new JsonBasic(value);
 		}
 
-        public static implicit operator JsonNode(long value)
-        {
-            return new JsonBasic(value);
-        }
+		public static implicit operator JsonNode(long value)
+		{
+			return new JsonBasic(value);
+		}
 
-        public static implicit operator JsonNode(float value)
+		public static implicit operator JsonNode(float value)
 		{
 			return new JsonBasic(value);
 		}
@@ -309,12 +325,12 @@ namespace NiceJson
 			return new JsonBasic(value);
 		}
 
-        public static implicit operator JsonNode(decimal value)
-        {
-            return new JsonBasic(value);
-        }
+		public static implicit operator JsonNode(decimal value)
+		{
+			return new JsonBasic(value);
+		}
 
-        public static implicit operator JsonNode(bool value)
+		public static implicit operator JsonNode(bool value)
 		{
 			return new JsonBasic(value);
 		}
@@ -335,323 +351,336 @@ namespace NiceJson
 
 		public static implicit operator int(JsonNode value)
 		{
-            return (int) Convert.ChangeType(((JsonBasic)value).ValueObject,typeof(int));
-        }
+			return (int) Convert.ChangeType(((JsonBasic)value).ValueObject,typeof(int));
+		}
 
-        public static implicit operator long (JsonNode value)
-        {
-            return (long) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(long));
-        }
-
-        public static implicit operator float(JsonNode value)
+		public static implicit operator long (JsonNode value)
 		{
-            return (float) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(float));
-        }
-		
+			return (long) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(long));
+		}
+
+		public static implicit operator float(JsonNode value)
+		{
+			return (float) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(float));
+		}
+
 		public static implicit operator double(JsonNode value)
 		{
-            return (double) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(double));
-        }
+			return (double) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(double));
+		}
 
-        public static implicit operator decimal (JsonNode value)
-        {
-            return (decimal) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(decimal));
-        }
-
-        public static implicit operator bool(JsonNode value)
+		public static implicit operator decimal (JsonNode value)
 		{
-            return (bool) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(bool));
-        }
+			return (decimal) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(decimal));
+		}
 
-        //Parsing logic
-        public static JsonNode ParseJsonString(string jsonString)
-        {
-            return ParseJsonPart(RemoveNonTokenChars(jsonString));
-        }
+		public static implicit operator bool(JsonNode value)
+		{
+			return (bool) Convert.ChangeType(((JsonBasic)value).ValueObject, typeof(bool));
+		}
 
-        private static JsonNode ParseJsonPart(string jsonPart)
-        {
-            JsonNode jsonPartValue = null;
-            switch (jsonPart[0])
-            {
-                case JsonNode.CHAR_CURLY_OPEN:
-                    {
-                        JsonObject jsonObject = new JsonObject();
-                        List<string> splittedParts = SplitJsonParts(jsonPart.Substring(1, jsonPart.Length - 2));
-                        string[] keyValueParts = new string[2];
+		//Parsing logic
+		public static JsonNode ParseJsonString(string jsonString)
+		{
+			return ParseJsonPart(RemoveNonTokenChars(jsonString));
+		}
 
-                        foreach (string keyValuePart in splittedParts)
-                        {
-                            keyValueParts = SplitKeyValuePart(keyValuePart);
-                            jsonObject[JsonNode.UnescapeString(keyValueParts[0])] = ParseJsonPart(keyValueParts[1]);
-                        }
-                        jsonPartValue = jsonObject;
-                    }
-                    break;
-                case JsonNode.CHAR_SQUARED_OPEN:
-                    {
-                        JsonArray jsonArray = new JsonArray();
-                        List<string> splittedParts = SplitJsonParts(jsonPart.Substring(1, jsonPart.Length - 2));
+		private static JsonNode ParseJsonPart(string jsonPart)
+		{
+			JsonNode jsonPartValue = null;
 
-                        foreach (string part in splittedParts)
-                        {
-                            jsonArray.Add(ParseJsonPart(part));
-                        }
-                        jsonPartValue = jsonArray;
-                    }
-                    break;
-                case JsonNode.CHAR_QUOTE:
-                    {
-                        jsonPartValue = new JsonBasic(JsonNode.UnescapeString(jsonPart.Substring(1, jsonPart.Length - 2)));
-                    }
-                    break;
-                case JsonNode.CHAR_FALSE_LITERAL://false
-                    {
-                        jsonPartValue = new JsonBasic(false);
-                    }
-                    break;
-                case JsonNode.CHAR_TRUE_LITERAL://true
-                    {
-                        jsonPartValue = new JsonBasic(true);
-                    }
-                    break;
-                case JsonNode.CHAR_NULL_LITERAL://null
-                    {
-                        jsonPartValue = null;
-                    }
-                    break;
-                default://it must be a number or it will fail
-                    {
-                        long longValue = 0;
-                        if (long.TryParse(jsonPart, NumberStyles.Any, CultureInfo.InvariantCulture, out longValue))
-                        {
-                            if (longValue > int.MaxValue || longValue < int.MinValue)
-                            {
-                                jsonPartValue = new JsonBasic(longValue);
-                            }
-                            else
-                            {
-                                jsonPartValue = new JsonBasic((int)longValue);
-                            }
-                        }
-                        else
-                        {
-                            decimal decimalValue = 0;
-                            if (decimal.TryParse(jsonPart, NumberStyles.Any, CultureInfo.InvariantCulture, out decimalValue))
-                            {
-                                jsonPartValue = new JsonBasic(decimalValue);
-                            }
-                        }
-                    }
-                    break;
-            }
+			if (jsonPart.Length == 0) 
+			{
+				return jsonPartValue;   
+			}
 
-            return jsonPartValue;
-        }
+			switch (jsonPart[0])
+			{
+			case JsonNode.CHAR_CURLY_OPEN:
+				{
+					JsonObject jsonObject = new JsonObject();
+					List<string> splittedParts = SplitJsonParts(jsonPart.Substring(1, jsonPart.Length - 2));
 
-        private static List<string> SplitJsonParts(string json)
-        {
-            List<string> jsonParts = new List<string>();
-            int identLevel = 0;
-            int lastPartChar = 0;
-            bool inString = false;
+					string[] keyValueParts = new string[2];
+					foreach (string keyValuePart in splittedParts) 
+					{
+						keyValueParts = SplitKeyValuePart (keyValuePart);
+						if (keyValueParts [0] != null) 
+						{
+							jsonObject [JsonNode.UnescapeString (keyValueParts [0])] = ParseJsonPart (keyValueParts [1]);
+						}
+					}
+					jsonPartValue = jsonObject;
+				}
+				break;
+			case JsonNode.CHAR_SQUARED_OPEN:
+				{
+					JsonArray jsonArray = new JsonArray();
+					List<string> splittedParts = SplitJsonParts(jsonPart.Substring(1, jsonPart.Length - 2));
 
-            for (int i = 0; i < json.Length; i++)
-            {
-                switch (json[i])
-                {
-                    case JsonNode.CHAR_COMMA:
-                        {
-                            if (!inString && identLevel == 0)
-                            {
-                                jsonParts.Add(json.Substring(lastPartChar, i - lastPartChar));
-                                lastPartChar = i + 1;
-                            }
-                        }
-                        break;
-                    case JsonNode.CHAR_QUOTE:
-                        {
-                            if (i == 0 || (json[i - 1] != JsonNode.CHAR_ESCAPE))
-                            {
-                                inString = !inString;
-                            }
-                        }
-                        break;
-                    case JsonNode.CHAR_CURLY_OPEN:
-                    case JsonNode.CHAR_SQUARED_OPEN:
-                        {
-                            if (!inString)
-                            {
-                                identLevel++;
-                            }
-                        }
-                        break;
-                    case JsonNode.CHAR_CURLY_CLOSED:
-                    case JsonNode.CHAR_SQUARED_CLOSED:
-                        {
-                            if (!inString)
-                            {
-                                identLevel--;
-                            }
-                        }
-                        break;
-                }
-            }
+					foreach (string part in splittedParts)
+					{
+						if (part.Length > 0) 
+						{
+							jsonArray.Add (ParseJsonPart (part));
+						}
+					}
+					jsonPartValue = jsonArray;
+				}
+				break;
+			case JsonNode.CHAR_QUOTE:
+				{
+					jsonPartValue = new JsonBasic(JsonNode.UnescapeString(jsonPart.Substring(1, jsonPart.Length - 2)));
+				}
+				break;
+			case JsonNode.CHAR_FALSE_LITERAL://false
+				{
+					jsonPartValue = new JsonBasic(false);
+				}
+				break;
+			case JsonNode.CHAR_TRUE_LITERAL://true
+				{
+					jsonPartValue = new JsonBasic(true);
+				}
+				break;
+			case JsonNode.CHAR_NULL_LITERAL://null
+				{
+					jsonPartValue = null;
+				}
+				break;
+			default://it must be a number or it will fail
+				{
+					long longValue = 0;
+					if (long.TryParse(jsonPart, NumberStyles.Any, CultureInfo.InvariantCulture, out longValue))
+					{
+						if (longValue > int.MaxValue || longValue < int.MinValue)
+						{
+							jsonPartValue = new JsonBasic(longValue);
+						}
+						else
+						{
+							jsonPartValue = new JsonBasic((int)longValue);
+						}
+					}
+					else
+					{
+						decimal decimalValue = 0;
+						if (decimal.TryParse(jsonPart, NumberStyles.Any, CultureInfo.InvariantCulture, out decimalValue))
+						{
+							jsonPartValue = new JsonBasic(decimalValue);
+						}
+					}
+				}
+				break;
+			}
 
-            jsonParts.Add(json.Substring(lastPartChar));
+			return jsonPartValue;
+		}
 
-            return jsonParts;
-        }
+		private static List<string> SplitJsonParts(string json)
+		{
+			List<string> jsonParts = new List<string>();
+			int identLevel = 0;
+			int lastPartChar = 0;
+			bool inString = false;
 
-        private static string[] SplitKeyValuePart(string json)
-        {
-            string[] parts = new string[2];
-            bool inString = false;
+			for (int i = 0; i < json.Length; i++)
+			{
+				switch (json[i])
+				{
+				case JsonNode.CHAR_COMMA:
+					{
+						if (!inString && identLevel == 0)
+						{
+							jsonParts.Add(json.Substring(lastPartChar, i - lastPartChar));
+							lastPartChar = i + 1;
+						}
+					}
+					break;
+				case JsonNode.CHAR_QUOTE:
+					{
+						if (i == 0 || (json[i - 1] != JsonNode.CHAR_ESCAPE))
+						{
+							inString = !inString;
+						}
+					}
+					break;
+				case JsonNode.CHAR_CURLY_OPEN:
+				case JsonNode.CHAR_SQUARED_OPEN:
+					{
+						if (!inString)
+						{
+							identLevel++;
+						}
+					}
+					break;
+				case JsonNode.CHAR_CURLY_CLOSED:
+				case JsonNode.CHAR_SQUARED_CLOSED:
+					{
+						if (!inString)
+						{
+							identLevel--;
+						}
+					}
+					break;
+				}
+			}
 
-            bool found = false;
-            int index = 0;
+			jsonParts.Add(json.Substring(lastPartChar));
 
-            while (index < json.Length && !found)
-            {
-                if (json[index] == JsonNode.CHAR_QUOTE && (index == 0 || (json[index - 1] != JsonNode.CHAR_ESCAPE)))
-                {
-                    if (!inString)
-                    {
-                        inString = true;
-                        index++;
-                    }
-                    else
-                    {
-                        parts[0] = json.Substring(1, index - 1);
-                        parts[1] = json.Substring(index + 2);//+2 because of the :
-                        found = true;
-                    }
-                }
-                else
-                {
-                    index++;
-                }
-            }
+			return jsonParts;
+		}
 
-            return parts;
-        }
+		private static string[] SplitKeyValuePart(string json)
+		{
+			string[] parts = new string[2];
+			bool inString = false;
 
-        private static string RemoveNonTokenChars(string s)
-        {
-            int len = s.Length;
-            char[] s2 = new char[len];
-            int currentPos = 0;
-            bool outString = true;
-            for (int i = 0; i < len; i++)
-            {
-                char c = s[i];
-                if (c == JsonNode.CHAR_QUOTE)
-                {
-                    if (i == 0 || (s[i - 1] != JsonNode.CHAR_ESCAPE))
-                    {
-                        outString = !outString;
-                    }
-                }
+			bool found = false;
+			int index = 0;
 
-                if (!outString || (
-                    (c != JsonNode.CHAR_SPACE) &&
-                    (c != JsonNode.CHAR_RF) &&
-                    (c != JsonNode.CHAR_NL) &&
-                    (c != JsonNode.CHAR_HT) &&
-                    (c != JsonNode.CHAR_BS) &&
-                    (c != JsonNode.CHAR_FF)
-                ))
-                {
-                    s2[currentPos++] = c;
-                }
-            }
-            return new String(s2, 0, currentPos);
-        }
+			while (index < json.Length && !found)
+			{
+				if (json[index] == JsonNode.CHAR_QUOTE && (index == 0 || (json[index - 1] != JsonNode.CHAR_ESCAPE)))
+				{
+					if (!inString)
+					{
+						inString = true;
+						index++;
+					}
+					else
+					{
+						parts[0] = json.Substring(1, index - 1);
+						parts[1] = json.Substring(index + 2);//+2 because of the :
+						found = true;
+					}
+				}
+				else
+				{
+					index++;
+				}
+			}
 
-        //Object logic
+			return parts;
+		}
 
-        public abstract string ToJsonString();
+		private static string RemoveNonTokenChars(string s)
+		{
+			int len = s.Length;
+			char[] s2 = new char[len];
+			int currentPos = 0;
+			bool outString = true;
+			for (int i = 0; i < len; i++)
+			{
+				char c = s[i];
+				if (c == JsonNode.CHAR_QUOTE)
+				{
+					if (i == 0 || (s[i - 1] != JsonNode.CHAR_ESCAPE))
+					{
+						outString = !outString;
+					}
+				}
 
-        public string ToJsonPrettyPrintString()
-        {
-            string jsonString = this.ToJsonString();
+				if (!outString || (
+					(c != JsonNode.CHAR_SPACE) &&
+					(c != JsonNode.CHAR_RF) &&
+					(c != JsonNode.CHAR_NL) &&
+					(c != JsonNode.CHAR_HT) &&
+					(c != JsonNode.CHAR_BS) &&
+					(c != JsonNode.CHAR_FF)
+				))
+				{
+					s2[currentPos++] = c;
+				}
+			}
+			return new String(s2, 0, currentPos);
+		}
 
-            string identStep = string.Empty;
-            for (int i = 0; i < PP_IDENT_COUNT; i++)
-            {
-                identStep += PP_IDENT_CHAR;
-            }
+		//Object logic
 
-            bool inString = false;
+		public abstract string ToJsonString();
 
-            string currentIdent = string.Empty;
-            for (int i = 0; i < jsonString.Length; i++)
-            {
-                switch (jsonString[i])
-                {
-                    case CHAR_COLON:
-                        {
-                            if (!inString)
-                            {
-                                jsonString = jsonString.Insert(i + 1, STRING_SPACE);
-                            }
-                        }
-                        break;
-                    case CHAR_QUOTE:
-                        {
-                            if (i == 0 || (jsonString[i - 1] != CHAR_ESCAPE))
-                            {
-                                inString = !inString;
-                            }
-                        }
-                        break;
-                    case CHAR_COMMA:
-                        {
-                            if (!inString)
-                            {
-                                jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
-                            }
-                        }
-                        break;
-                    case CHAR_CURLY_OPEN:
-                    case CHAR_SQUARED_OPEN:
-                        {
-                            if (!inString)
-                            {
-                                currentIdent += identStep;
-                                jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
-                            }
-                        }
-                        break;
-                    case CHAR_CURLY_CLOSED:
-                    case CHAR_SQUARED_CLOSED:
-                        {
-                            if (!inString)
-                            {
-                                currentIdent = currentIdent.Substring(0, currentIdent.Length - identStep.Length);
-                                jsonString = jsonString.Insert(i, CHAR_NL + currentIdent);
-                                i += currentIdent.Length + 1;
-                            }
-                        }
-                        break;
-                }
-            }
+		public string ToJsonPrettyPrintString()
+		{
+			string jsonString = this.ToJsonString();
 
-            return jsonString;
-        }
-    }
+			string identStep = string.Empty;
+			for (int i = 0; i < PP_IDENT_COUNT; i++)
+			{
+				identStep += PP_IDENT_CHAR;
+			}
 
+			bool inString = false;
+
+			string currentIdent = string.Empty;
+			for (int i = 0; i < jsonString.Length; i++)
+			{
+				switch (jsonString[i])
+				{
+				case CHAR_COLON:
+					{
+						if (!inString)
+						{
+							jsonString = jsonString.Insert(i + 1, STRING_SPACE);
+						}
+					}
+					break;
+				case CHAR_QUOTE:
+					{
+						if (i == 0 || (jsonString[i - 1] != CHAR_ESCAPE))
+						{
+							inString = !inString;
+						}
+					}
+					break;
+				case CHAR_COMMA:
+					{
+						if (!inString)
+						{
+							jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
+						}
+					}
+					break;
+				case CHAR_CURLY_OPEN:
+				case CHAR_SQUARED_OPEN:
+					{
+						if (!inString)
+						{
+							currentIdent += identStep;
+							jsonString = jsonString.Insert(i + 1, CHAR_NL + currentIdent);
+						}
+					}
+					break;
+				case CHAR_CURLY_CLOSED:
+				case CHAR_SQUARED_CLOSED:
+					{
+						if (!inString)
+						{
+							currentIdent = currentIdent.Substring(0, currentIdent.Length - identStep.Length);
+							jsonString = jsonString.Insert(i, CHAR_NL + currentIdent);
+							i += currentIdent.Length + 1;
+						}
+					}
+					break;
+				}
+			}
+
+			return jsonString;
+		}
+	}
+
+	[Serializable]
 	public class JsonBasic : JsonNode
 	{
-        public object ValueObject
-        {
-            get
-            {
-                return m_value;
-            }
-        }
+		public object ValueObject
+		{
+			get
+			{
+				return m_value;
+			}
+		}
 
-        private object m_value;
+		private object m_value;
 
 		public JsonBasic(object value)
 		{
@@ -675,44 +704,45 @@ namespace NiceJson
 			}
 			else if (m_value is bool)
 			{
-                if ((bool) m_value)
-                {
-                    return STRING_LITERAL_TRUE;
-                }
-                else
-                {
-                    return STRING_LITERAL_FALSE;
-                }
+				if ((bool) m_value)
+				{
+					return STRING_LITERAL_TRUE;
+				}
+				else
+				{
+					return STRING_LITERAL_FALSE;
+				}
 			}
-            else
-            {
-                return m_value.ToString();
-            }
+			else
+			{
+				return m_value.ToString();
+			}
 		}
 
-    }
+	}
 
+	[Serializable]
 	public class JsonObject : JsonNode, IEnumerable
-    {
+	{
 		private Dictionary<string,JsonNode> m_dictionary = new Dictionary<string, JsonNode>();
 
-        public Dictionary<string,JsonNode>.KeyCollection Keys
-        {
-            get
-            {
-                return m_dictionary.Keys;
-            }
-        }
+		public Dictionary<string,JsonNode>.KeyCollection Keys
+		{
+			get
+			{
+				return m_dictionary.Keys;
+			}
+		}
 
-        public Dictionary<string, JsonNode>.ValueCollection Values
-        {
-            get
-            {
-                return m_dictionary.Values;
-            }
-        }
+		public Dictionary<string, JsonNode>.ValueCollection Values
+		{
+			get
+			{
+				return m_dictionary.Values;
+			}
+		}
 
-        public new JsonNode this[string key]
+		public new JsonNode this[string key]
 		{
 			get
 			{
@@ -725,17 +755,17 @@ namespace NiceJson
 			}
 		}
 
-        public void Add(string key, JsonNode value)
-        {
-            m_dictionary.Add(key, value);
-        }
+		public void Add(string key, JsonNode value)
+		{
+			m_dictionary.Add(key, value);
+		}
 
-        public bool Remove(string key)
-        {
-            return m_dictionary.Remove(key);
-        }
+		public bool Remove(string key)
+		{
+			return m_dictionary.Remove(key);
+		}
 
-        public bool ContainsKey(string key)
+		public bool ContainsKey(string key)
 		{
 			return m_dictionary.ContainsKey(key);
 		}
@@ -745,33 +775,33 @@ namespace NiceJson
 			return m_dictionary.ContainsValue(value);
 		}
 
-        public void Clear()
-        {
-            m_dictionary.Clear();
-        }
+		public void Clear()
+		{
+			m_dictionary.Clear();
+		}
 
-        public int Count
-        {
-            get
-            {
-                return m_dictionary.Count;
-            }
-        }
+		public int Count
+		{
+			get
+			{
+				return m_dictionary.Count;
+			}
+		}
 
-        public IEnumerator GetEnumerator()
-        {
-            foreach (KeyValuePair<string, JsonNode> jsonKeyValue in m_dictionary)
-            {
-                yield return jsonKeyValue;
-            }
-        }
+		public IEnumerator GetEnumerator()
+		{
+			foreach (KeyValuePair<string, JsonNode> jsonKeyValue in m_dictionary)
+			{
+				yield return jsonKeyValue;
+			}
+		}
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
-        public override string ToJsonString ()
+		public override string ToJsonString ()
 		{
 			if (m_dictionary == null)
 			{
@@ -780,8 +810,8 @@ namespace NiceJson
 			else
 			{
 				string jsonString = string.Empty;
-                jsonString += CHAR_CURLY_OPEN;
-                foreach (string key in m_dictionary.Keys)
+				jsonString += CHAR_CURLY_OPEN;
+				foreach (string key in m_dictionary.Keys)
 				{
 					jsonString += CHAR_QUOTE+ EscapeString(key) + CHAR_QUOTE+ CHAR_COLON;
 					if (m_dictionary[key] != null)
@@ -793,8 +823,8 @@ namespace NiceJson
 						jsonString += STRING_LITERAL_NULL;
 					}
 
-                    jsonString += CHAR_COMMA;
-                }
+					jsonString += CHAR_COMMA;
+				}
 				if (jsonString[jsonString.Length -1] == CHAR_COMMA)
 				{
 					jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,
@@ -807,8 +837,9 @@ namespace NiceJson
 		}
 	}
 
+	[Serializable]
 	public class JsonArray : JsonNode, IEnumerable<JsonNode>
-    {
+	{
 		private List<JsonNode> m_list = new List<JsonNode>();
 
 		public int Count
@@ -818,36 +849,36 @@ namespace NiceJson
 				return m_list.Count;
 			}
 		}
-		
+
 		public new JsonNode this[int index]
 		{
 			get
 			{
 				return m_list[index];
 			}
-			
+
 			set
 			{
 				m_list[index] = value;
 			}
 		}
 
-        public IEnumerator<JsonNode> GetEnumerator()
-        {
-            foreach (JsonNode value in m_list)
-            {
-                yield return value;
-            }
-        }
+		public IEnumerator<JsonNode> GetEnumerator()
+		{
+			foreach (JsonNode value in m_list)
+			{
+				yield return value;
+			}
+		}
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
-        //expose some methods of list extends with needs
+		//expose some methods of list extends with needs
 
-        public void Add(JsonNode item)
+		public void Add(JsonNode item)
 		{
 			m_list.Add(item);
 		}
@@ -857,22 +888,22 @@ namespace NiceJson
 			m_list.AddRange(collection);
 		}
 
-        public void Insert(int index,JsonNode item)
-        {
-            m_list.Insert(index,item);
-        }
+		public void Insert(int index,JsonNode item)
+		{
+			m_list.Insert(index,item);
+		}
 
-        public void InsertRange(int index,IEnumerable<JsonNode> collection)
-        {
-            m_list.InsertRange(index,collection);
-        }
+		public void InsertRange(int index,IEnumerable<JsonNode> collection)
+		{
+			m_list.InsertRange(index,collection);
+		}
 
-        public void RemoveAt(int index)
-        {
-            m_list.RemoveAt(index);
-        }
+		public void RemoveAt(int index)
+		{
+			m_list.RemoveAt(index);
+		}
 
-        public bool Remove(JsonNode item)
+		public bool Remove(JsonNode item)
 		{
 			return m_list.Remove(item);
 		}
@@ -884,7 +915,7 @@ namespace NiceJson
 
 		//end exposed methods
 
-		
+
 		public override string ToJsonString ()
 		{
 			if (m_list == null)
@@ -894,8 +925,8 @@ namespace NiceJson
 			else
 			{
 				string jsonString = string.Empty;
-                jsonString += CHAR_SQUARED_OPEN;
-                foreach (JsonNode value in m_list)
+				jsonString += CHAR_SQUARED_OPEN;
+				foreach (JsonNode value in m_list)
 				{
 					if (value != null)
 					{
@@ -906,8 +937,8 @@ namespace NiceJson
 						jsonString += STRING_LITERAL_NULL;
 					}
 
-                    jsonString += CHAR_COMMA;
-                }
+					jsonString += CHAR_COMMA;
+				}
 				if (jsonString[jsonString.Length-1] == CHAR_COMMA)
 				{
 					jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,

@@ -23,6 +23,9 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+
+    Appreciation Contributions:
+        Rayco Sánchez García <raycosanchezgarcia@gmail.com>
 */
 
 using System;
@@ -86,7 +89,7 @@ namespace NiceJson
 
         protected const string STRING_ESCAPED_UNICODE_INIT = "\\u00";
 
-        //Indexers
+        //Indexers and accesors
         public JsonNode this[string key]
         {
             get
@@ -133,15 +136,16 @@ namespace NiceJson
             }
         }
 
-        public bool ContainsKey (string key) {
-          if (this is JsonObject)
-          {
-            return ((JsonObject)this).ContainsKey(key);
-          }
-          else
-          {
-            return false;
-          }
+        public bool ContainsKey (string key)
+        {
+            if (this is JsonObject)
+            {
+                return ((JsonObject)this).ContainsKey(key);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         //escaping logic
