@@ -1,3 +1,7 @@
+Version 1.3 released 2016-06-29
+ * Added serialization in classes
+ * Added accesor to dictionary in JsonNode 
+
 Version 1.2 released 2015-09-22
 
  * Added unescape when parsing Json
