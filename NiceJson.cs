@@ -133,6 +133,17 @@ namespace NiceJson
             }
         }
 
+        public bool ContainsKey (string key) {
+          if (this is JsonObject)
+          {
+            return ((JsonObject)this).ContainsKey(key);
+          }
+          else
+          {
+            return false;
+          }
+        }
+
         //escaping logic
 
         //Escaping/Unescaping logic
