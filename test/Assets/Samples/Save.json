@@ -1,0 +1,46 @@
+{
+	"MediSim.Controllers.WorldController": {
+		"chunks": [
+			{
+				"chunkX": 0,
+				"chunkY": 0
+			},
+			{
+				"chunkX": 0,
+				"chunkY": 1
+			},
+			{
+				"chunkX": 1,
+				"chunkY": 0
+			},
+			{
+				"chunkX": 1,
+				"chunkY": 1
+			}
+		]
+	},
+	"MediSim.Controllers.NPCController": {
+		"npcs": [
+			
+		]
+	},
+	"MediSim.Controllers.ZoneController": {
+		"zones": [
+			{
+				"type": "LoadingZone",
+				"rects": [
+					{
+						"x": 31,
+						"y": 7,
+						"width": 3,
+						"height": 2
+					}
+				]
+			}
+		]
+	},
+	"MediSim.Controllers.CameraController": {
+		"position": "158.6716:0:29.26525",
+		"rotation": "0:30:0"
+	}
+}

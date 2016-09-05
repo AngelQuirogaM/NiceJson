@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using NiceJson;
 
@@ -10,11 +10,15 @@ public class JsonTest : MonoBehaviour {
     {
         //ExampleTest();
         //UnicodeTest();
-        UnescapingTest();
+        //UnescapingTest();
         //UnicodeFileTest();
 
         //InputOutputFileTest();
         //CreateJsonTest();
+        //SerializeObject();
+
+        EmptyArrayTest();
+        EmptyNodeTest();
     }
 
     private void ExampleTest()
@@ -119,6 +123,34 @@ public class JsonTest : MonoBehaviour {
         }
 
         Debug.Log("Test InputOutputFileTest done: \n"+ weekDiet.ToJsonPrettyPrintString());
+    }
+
+    private void EmptyArrayTest()
+    {
+        string inputfile = "/Samples/Save.json";
+        string jsonString = File.ReadAllText("Assets/" + inputfile);
+        Debug.Log(JsonNode.ParseJsonString(jsonString).ToJsonPrettyPrintString());
+    }
+
+
+    private void EmptyNodeTest()
+    {
+        string inputfile = "/Samples/Save2.json";
+        string jsonString = File.ReadAllText("Assets/" + inputfile);
+        Debug.Log(JsonNode.ParseJsonString(jsonString).ToJsonPrettyPrintString());
+    }
+
+    private void SerializeObject()
+    {
+        object testObject = new List<string>();
+
+        //JsonFormatter formatter = new JsonFormatter();
+        //formatter.Serialize(testObject);
+    }
+
+    private void DeserializeObject()
+    {
+
     }
 
 }
