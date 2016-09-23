@@ -226,7 +226,7 @@ namespace NiceJson
 
         protected static string UnescapeString(string s)
         {
-            string result = string.Empty;
+            StringBuilder result = new StringBuilder(s.Length);
 
             for (int i=0;i<s.Length;i++)
             {
@@ -238,64 +238,64 @@ namespace NiceJson
                     {
                     case CHAR_ESCAPE:
                         {
-                            result += s[i];
+                            result.Append(s[i]);
                         }
                         break;
                     case CHAR_SOLIDUS:
                         {
-                            result += s[i];
+                            result.Append(s[i]);
                         }
                         break;
                     case CHAR_ESCAPED_QUOTE:
                         {
-                            result += s[i];
+                            result.Append(s[i]);
                         }
                         break;
                     case CHAR_N:
                         {
-                            result += CHAR_NL;
+                            result.Append(CHAR_NL);
                         }
                         break;
                     case CHAR_R:
                         {
-                            result += CHAR_RF;
+                            result.Append(CHAR_RF);
                         }
                         break;
                     case CHAR_T:
                         {
-                            result += CHAR_HT;
+                            result.Append(CHAR_HT);
                         }
                         break;
                     case CHAR_B:
                         {
-                            result += CHAR_BS;
+                            result.Append(CHAR_BS);
                         }
                         break;
                     case CHAR_F:
                         {
-                            result += CHAR_FF;
+                            result.Append(CHAR_FF);
                         }
                         break;
                     case CHAR_U:
                         {
-                            result += (char) int.Parse(s.Substring(i+1,4),NumberStyles.AllowHexSpecifier);
+                            result.Append((char) int.Parse(s.Substring(i+1,4),NumberStyles.AllowHexSpecifier));
                             i = i + 4;
                         }
                         break;
                     default:
                         {
-                            result += s[i];
+                            result.Append(s[i]);
                         }
                         break;
                     }
                 }
                 else
                 {
-                    result += s[i];
+                    result.Append(s[i]);
                 }
             }
 
-            return result;
+            return result.ToString();
         }
 
         //setter implicit casting 
