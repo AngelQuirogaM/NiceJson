@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Globalization;
+using System.Text;
 
 namespace NiceJson
 {
@@ -153,7 +154,7 @@ namespace NiceJson
         //Escaping/Unescaping logic
         protected static string EscapeString(string s)
         {
-            string result = string.Empty;
+            StringBuilder result = new StringBuilder();
 
             foreach (char c in s)
             {
@@ -161,7 +162,7 @@ namespace NiceJson
                 {
                 case CHAR_ESCAPE:
                     {
-                        result += STRING_ESCAPED_ESCAPE;
+                        result.Append(STRING_ESCAPED_ESCAPE);
                     }
                     break;
                 case CHAR_SOLIDUS:
@@ -169,59 +170,59 @@ namespace NiceJson
                         #pragma warning disable
                         if (ESCAPE_SOLIDUS)
                         {
-                            result += STRING_ESCAPED_SOLIDUS;
+                            result.Append(STRING_ESCAPED_SOLIDUS);
                         }
                         else
                         {
-                            result += c;
+                            result.Append(c);
                         }
                         #pragma warning restore
                     }
                     break;
                 case CHAR_ESCAPED_QUOTE:
                     {
-                        result += STRING_ESCAPED_ESCAPED_QUOTE;
+                        result.Append (STRING_ESCAPED_ESCAPED_QUOTE);
                     }
                     break;
                 case CHAR_NL:
                     {
-                        result += STRING_ESCAPED_NL;
+                        result.Append (STRING_ESCAPED_NL);
                     }
                     break;
                 case CHAR_RF:
                     {
-                        result += STRING_ESCAPED_RF;
+                        result.Append (STRING_ESCAPED_RF);
                     }
                     break;
                 case CHAR_HT:
                     {
-                        result += STRING_ESCAPED_TAB;
+                        result.Append (STRING_ESCAPED_TAB);
                     }
                     break;
                 case CHAR_BS:
                     {
-                        result += STRING_ESCAPED_BS;
+                        result.Append (STRING_ESCAPED_BS);
                     }
                     break;
                 case CHAR_FF:
                     {
-                        result += STRING_ESCAPED_FF;
+                        result.Append (STRING_ESCAPED_FF);
                     }
                     break;
                 default:
                     if (c < CHAR_SPACE)
                     {
-                        result += STRING_ESCAPED_UNICODE_INIT + Convert.ToByte(c).ToString("x2").ToUpper();
+                        result.Append (STRING_ESCAPED_UNICODE_INIT + Convert.ToByte(c).ToString("x2").ToUpper());
                     }
                     else
                     {
-                        result += c;
+                        result.Append(c);
                     }
                     break;
                 }
             }
 
-            return result;
+            return result.ToString();
         }
 
         protected static string UnescapeString(string s)
@@ -809,29 +810,32 @@ namespace NiceJson
             }
             else
             {
-                string jsonString = string.Empty;
-                jsonString += CHAR_CURLY_OPEN;
+                StringBuilder jsonString = new StringBuilder();
+                jsonString.Append(CHAR_CURLY_OPEN);
                 foreach (string key in m_dictionary.Keys)
                 {
-                    jsonString += CHAR_QUOTE+ EscapeString(key) + CHAR_QUOTE+ CHAR_COLON;
+                    jsonString.Append(CHAR_QUOTE);
+                    jsonString.Append(EscapeString(key));
+                    jsonString.Append(CHAR_QUOTE);
+                    jsonString.Append(CHAR_COLON);
+
                     if (m_dictionary[key] != null)
                     {
-                        jsonString += m_dictionary[key].ToJsonString();
+                        jsonString.Append(m_dictionary[key].ToJsonString());
                     }
                     else
                     {
-                        jsonString += STRING_LITERAL_NULL;
+                        jsonString.Append(STRING_LITERAL_NULL);
                     }
-
-                    jsonString += CHAR_COMMA;
+                    jsonString.Append(CHAR_COMMA);
                 }
                 if (jsonString[jsonString.Length -1] == CHAR_COMMA)
                 {
-                    jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,
+                    jsonString.Remove(jsonString.Length -1,1);
                 }
-                jsonString+= CHAR_CURLY_CLOSED;
+                jsonString.Append(CHAR_CURLY_CLOSED);
 
-                return jsonString;
+                return jsonString.ToString();
             }
 
         }
@@ -924,27 +928,28 @@ namespace NiceJson
             }
             else
             {
-                string jsonString = string.Empty;
-                jsonString += CHAR_SQUARED_OPEN;
+                StringBuilder jsonString = new StringBuilder();
+                jsonString.Append (CHAR_SQUARED_OPEN);
                 foreach (JsonNode value in m_list)
                 {
                     if (value != null)
                     {
-                        jsonString+= value.ToJsonString();
+                        jsonString.Append (value.ToJsonString());
                     }
                     else
                     {
-                        jsonString += STRING_LITERAL_NULL;
+                        jsonString.Append (STRING_LITERAL_NULL);
                     }
 
-                    jsonString += CHAR_COMMA;
+                    jsonString.Append (CHAR_COMMA);
                 }
                 if (jsonString[jsonString.Length-1] == CHAR_COMMA)
                 {
-                    jsonString = jsonString.Substring(0,jsonString.Length -1);//removing last ,
+                    jsonString.Remove(jsonString.Length -1,1);
                 }
-                jsonString+= CHAR_SQUARED_CLOSED;
-                return jsonString;
+                jsonString.Append (CHAR_SQUARED_CLOSED);
+
+                return jsonString.ToString();
             }
         }
     }
