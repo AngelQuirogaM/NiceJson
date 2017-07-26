@@ -1,5 +1,5 @@
 ﻿/*
-    NiceJson 1.3 (2016-06-28)
+    NiceJson 1.3.1 (2017-07-26)
 
     MIT License
     ===========
@@ -766,7 +766,7 @@ namespace NiceJson
 			return m_dictionary.Remove(key);
 		}
 
-		public bool ContainsKey(string key)
+		public new bool ContainsKey(string key)
 		{
 			return m_dictionary.ContainsKey(key);
 		}
