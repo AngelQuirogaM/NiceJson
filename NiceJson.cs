@@ -1,5 +1,5 @@
-﻿/*
-    NiceJson 1.3.1 (2017-07-26)
+/*
+    NiceJson 1.3.2 (2019-09-21)
 
     MIT License
     ===========
@@ -764,6 +764,12 @@ namespace NiceJson
 		public bool Remove(string key)
 		{
 			return m_dictionary.Remove(key);
+		}
+
+		public JsonNode GetValue(string key, JsonNode defaultValue = default(JsonNode))
+		{
+			JsonNode value;
+			return m_dictionary.TryGetValue(key, out value) ? value : defaultValue;
 		}
 
 		public new bool ContainsKey(string key)
