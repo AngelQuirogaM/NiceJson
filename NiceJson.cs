@@ -1,5 +1,5 @@
 /*
-    NiceJson 1.3.2 (2019-09-21)
+    NiceJson 1.3.3 (2020-05-11)
 
     MIT License
     ===========
@@ -714,9 +714,16 @@ namespace NiceJson
 					return STRING_LITERAL_FALSE;
 				}
 			}
-			else
+			else //number
 			{
-				return m_value.ToString();
+				if (m_value is decimal)
+				{
+					return ((decimal) m_value).ToString(CultureInfo.InvariantCulture);
+				}
+				else
+				{
+					return m_value.ToString();
+				}
 			}
 		}
 
